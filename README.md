@@ -21,7 +21,7 @@ A local database-driven ERM (Enterprise Resource Management) system specifically
 
 1. Clone this repository:
    ```
-   git clone https://github.com/yourusername/spaaarkERM.git
+   git clone https://github.com/kevinlin29/spaaarkERM.git
    cd spaaarkERM
    ```
 
