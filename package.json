@@ -1,0 +1,19 @@
+{
+  "name": "spaaarkerm",
+  "version": "1.0.0",
+  "description": "3D Printing Business ERM System",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "sqlite3": "^5.1.6",
+    "electron-store": "^8.1.0"
+  },
+  "devDependencies": {
+    "electron": "^25.3.1"
+  }
+} 

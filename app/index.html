@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Printing ERM System</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <nav class="sidebar">
+      <div class="app-title">
+        <h1>3D Print ERM</h1>
+      </div>
+      <ul class="nav-menu">
+        <li><a href="#" data-view="dashboard" class="active">Dashboard</a></li>
+        <li><a href="#" data-view="users">Users</a></li>
+        <li><a href="#" data-view="projects">Projects</a></li>
+        <li><a href="#" data-view="plates">Plates</a></li>
+        <li><a href="#" data-view="materials">Materials</a></li>
+        <li><a href="#" data-view="reports">Reports</a></li>
+      </ul>
+    </nav>
+    
+    <main class="content">
+      <!-- Dashboard View -->
+      <section id="dashboard" class="view active">
+        <h2>Dashboard</h2>
+        <div class="dashboard-stats">
+          <div class="stat-card">
+            <h3>Total Plates</h3>
+            <div class="stat-value" id="total-plates">0</div>
+          </div>
+          <div class="stat-card">
+            <h3>Material Used</h3>
+            <div class="stat-value" id="total-material">0g</div>
+          </div>
+          <div class="stat-card">
+            <h3>Total Sales</h3>
+            <div class="stat-value" id="total-sales">$0</div>
+          </div>
+          <div class="stat-card">
+            <h3>Total Costs</h3>
+            <div class="stat-value" id="total-costs">$0</div>
+          </div>
+          <div class="stat-card">
+            <h3>Total Profit</h3>
+            <div class="stat-value" id="total-profit">$0</div>
+          </div>
+        </div>
+        
+        <!-- Cost Model Configuration -->
+        <div class="dashboard-cost-model">
+          <h3>Cost Model Configuration</h3>
+          <div class="cost-model-settings">
+            <div class="form-group">
+              <label for="cost-model-type">Cost Calculation Method:</label>
+              <select id="cost-model-type">
+                <option value="weight">By Weight Only</option>
+                <option value="max">Maximum of Weight or Time</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="time-cost-container">
+              <label for="time-cost-rate">Cost per Hour ($):</label>
+              <input type="number" id="time-cost-rate" min="0" step="0.01" value="10.00">
+            </div>
+            
+            <button id="save-cost-model" class="action-btn">Save Cost Model</button>
+          </div>
+          <p class="cost-model-description">
+            <strong>By Weight Only:</strong> Cost = Material Weight × Cost per Gram<br>
+            <strong>Maximum of Weight or Time:</strong> Cost = Max(Material Cost, Time Cost)
+          </p>
+          
+          <h3>Default Pricing Settings</h3>
+          <p class="info-text">These settings are used as defaults for new projects. Each project can override these settings with its own pricing method.</p>
+          <div class="pricing-settings">
+            <div class="form-group">
+              <label for="pricing-method">Default Pricing Method:</label>
+              <select id="pricing-method">
+                <option value="none">Manual Pricing</option>
+                <option value="markup">Fixed Markup</option>
+                <option value="fixed-gram">Fixed Price per Gram</option>
+                <option value="fixed-hour">Fixed Price per Hour</option>
+              </select>
+            </div>
+            
+            <div class="form-group pricing-option" id="markup-container">
+              <label for="markup-percentage">Markup Percentage (%):</label>
+              <input type="number" id="markup-percentage" min="0" step="1" value="50">
+            </div>
+            
+            <div class="form-group pricing-option" id="price-per-gram-container">
+              <label for="price-per-gram">Price per Gram ($):</label>
+              <input type="number" id="price-per-gram" min="0" step="0.01" value="0.10">
+            </div>
+            
+            <div class="form-group pricing-option" id="price-per-hour-container">
+              <label for="price-per-hour">Price per Hour ($):</label>
+              <input type="number" id="price-per-hour" min="0" step="0.01" value="20.00">
+            </div>
+            
+            <button id="save-pricing" class="action-btn">Save Default Pricing</button>
+          </div>
+          <p class="cost-model-description">
+            <strong>Manual Pricing:</strong> You set the price for each plate manually<br>
+            <strong>Fixed Markup:</strong> Sale Price = Cost × (1 + Markup%/100)<br>
+            <strong>Fixed Price per Gram:</strong> Sale Price = Weight × Price per Gram<br>
+            <strong>Fixed Price per Hour:</strong> Sale Price = Print Time × Price per Hour
+          </p>
+        </div>
+        
+        <div class="dashboard-alerts">
+          <h3>Material Alerts</h3>
+          <div id="material-alerts" class="alert-container">
+            <!-- Alerts will be dynamically added here -->
+          </div>
+        </div>
+      </section>
+      
+      <!-- Users View -->
+      <section id="users" class="view">
+        <h2>Users</h2>
+        <button id="add-user-btn" class="action-btn">Add User</button>
+        
+        <div class="data-table-container">
+          <table id="users-table" class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- User data will be dynamically added here -->
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- User Form Modal -->
+        <div id="user-modal" class="modal">
+          <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="user-form-title">Add User</h3>
+            <form id="user-form">
+              <input type="hidden" id="user-id">
+              <div class="form-group">
+                <label for="user-name">Name:</label>
+                <input type="text" id="user-name" required>
+              </div>
+              <div class="form-group">
+                <label for="user-email">Email:</label>
+                <input type="email" id="user-email">
+              </div>
+              <button type="submit" class="submit-btn">Save</button>
+            </form>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Projects View -->
+      <section id="projects" class="view">
+        <h2>Projects</h2>
+        
+        <!-- User Filter Dropdown -->
+        <div class="filter-container">
+          <label for="project-user-filter">Filter by User:</label>
+          <select id="project-user-filter">
+            <option value="">All Users</option>
+            <!-- User options will be dynamically added here -->
+          </select>
+        </div>
+        
+        <button id="add-project-btn" class="action-btn">Add Project</button>
+        
+        <div class="data-table-container">
+          <table id="projects-table" class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Pricing Method</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Project data will be dynamically added here -->
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Project Form Modal -->
+        <div id="project-modal" class="modal">
+          <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="project-form-title">Add Project</h3>
+            <form id="project-form">
+              <input type="hidden" id="project-id">
+              <div class="form-group">
+                <label for="project-user">User:</label>
+                <select id="project-user" required>
+                  <!-- User options will be dynamically added here -->
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="project-name">Name:</label>
+                <input type="text" id="project-name" required>
+              </div>
+              <div class="form-group">
+                <label for="project-description">Description:</label>
+                <textarea id="project-description"></textarea>
+              </div>
+              
+              <h4>Pricing Settings</h4>
+              <div class="form-group">
+                <label for="project-pricing-method">Pricing Method:</label>
+                <select id="project-pricing-method">
+                  <option value="none">Manual Pricing</option>
+                  <option value="markup">Fixed Markup</option>
+                  <option value="fixed-gram">Fixed Price per Gram</option>
+                  <option value="fixed-hour">Fixed Price per Hour</option>
+                </select>
+              </div>
+              
+              <div class="pricing-settings-container">
+                <div class="form-group project-pricing-option" id="project-markup-container">
+                  <label for="project-markup-percentage">Markup Percentage (%):</label>
+                  <input type="number" id="project-markup-percentage" min="0" step="1" value="50">
+                </div>
+                
+                <div class="form-group project-pricing-option" id="project-price-per-gram-container">
+                  <label for="project-price-per-gram">Price per Gram ($):</label>
+                  <input type="number" id="project-price-per-gram" min="0" step="0.01" value="0.10">
+                </div>
+                
+                <div class="form-group project-pricing-option" id="project-price-per-hour-container">
+                  <label for="project-price-per-hour">Price per Hour ($):</label>
+                  <input type="number" id="project-price-per-hour" min="0" step="0.01" value="20.00">
+                </div>
+              </div>
+              
+              <button type="submit" class="submit-btn">Save</button>
+            </form>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Plates View -->
+      <section id="plates" class="view">
+        <h2>Plates</h2>
+        <div class="button-group">
+          <button id="add-plate-btn" class="action-btn">Add Plate</button>
+          <button id="batch-add-plates-btn" class="action-btn">Batch Add Plates</button>
+        </div>
+        
+        <div class="data-table-container">
+          <table id="plates-table" class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Project</th>
+                <th>Material</th>
+                <th>Grams Used</th>
+                <th>Price Sold</th>
+                <th>Cost</th>
+                <th>Profit</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Plate data will be dynamically added here -->
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Plate Form Modal -->
+        <div id="plate-modal" class="modal">
+          <div class="modal-content">
+            <span class="close" onclick="document.getElementById('plate-modal').style.display='none'">&times;</span>
+            <h2 id="plate-form-title">Add Plate</h2>
+            <form id="plate-form">
+              <input type="hidden" id="plate-id">
+              <div class="form-group">
+                <label for="plate-project">Project</label>
+                <select id="plate-project" required></select>
+              </div>
+              <div class="form-group">
+                <label for="plate-material">Material</label>
+                <select id="plate-material" required onchange="updatePlateCostProfit()"></select>
+              </div>
+              <div class="form-group">
+                <label for="plate-grams">Material Used (grams)</label>
+                <input type="number" id="plate-grams" step="0.1" min="0" required oninput="updatePlateCostProfit()">
+              </div>
+              <div class="form-group" id="plate-time-container">
+                <label for="plate-time">Print Time (hours)</label>
+                <input type="number" id="plate-time" step="0.1" min="0" oninput="updatePlateCostProfit()">
+              </div>
+              <div class="form-group">
+                <label for="plate-date">Date</label>
+                <input type="datetime-local" id="plate-date" required>
+              </div>
+              <div class="cost-profit-section">
+                <div class="cost-item">
+                  <label>Material Cost:</label>
+                  <span id="plate-material-cost">$0.00</span>
+                </div>
+                <div class="cost-item" id="plate-time-cost-container">
+                  <label>Time Cost:</label>
+                  <span id="plate-time-cost">$0.00</span>
+                </div>
+                <div class="cost-item">
+                  <label>Total Cost:</label>
+                  <span id="plate-cost">$0.00</span>
+                </div>
+                <div class="cost-item">
+                  <label>Price Sold:</label>
+                  <span id="plate-price">$0.00</span>
+                  <input type="hidden" id="plate-price-input">
+                </div>
+                <div class="cost-item">
+                  <label>Profit:</label>
+                  <span id="plate-profit">$0.00</span>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="button" onclick="savePlate()">Save</button>
+                <button type="button" onclick="document.getElementById('plate-modal').style.display='none'">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        
+        <!-- Batch Plate Form Modal -->
+        <div id="batch-plate-modal" class="modal">
+          <div class="modal-content batch-modal-content">
+            <span class="close">&times;</span>
+            <h2>Batch Add Plates</h2>
+            <form id="batch-plate-form">
+              <div class="batch-common-fields">
+                <div class="form-group">
+                  <label for="batch-plate-project">Project</label>
+                  <select id="batch-plate-project" required></select>
+                </div>
+                <div class="form-group">
+                  <label for="batch-plate-material">Material</label>
+                  <select id="batch-plate-material" required></select>
+                </div>
+                <p>For each plate, specify the weight and optional print time. Prices will be calculated automatically based on your pricing settings.</p>
+              </div>
+              
+              <div id="batch-plates-container">
+                <!-- Plate entries will be added here -->
+                <div class="batch-plate-entry">
+                  <div class="form-group">
+                    <label>Material Used (grams)</label>
+                    <input type="number" class="batch-plate-grams" step="0.1" min="0" required>
+                  </div>
+                  <div class="form-group batch-plate-time-container">
+                    <label>Print Time (hours)</label>
+                    <input type="number" class="batch-plate-time" step="0.1" min="0">
+                  </div>
+                  <div class="form-group">
+                    <label>Date</label>
+                    <input type="datetime-local" class="batch-plate-date" required>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="batch-controls">
+                <button type="button" id="add-batch-entry">+ Add Another Plate</button>
+                <button type="button" id="calculate-batch-prices">Preview Prices</button>
+              </div>
+              
+              <div id="batch-price-preview"></div>
+              
+              <div class="form-actions">
+                <button type="button" id="save-batch-plates">Save All Plates</button>
+                <button type="button" class="cancel-btn">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Materials View -->
+      <section id="materials" class="view">
+        <h2>Materials</h2>
+        <button id="add-material-btn" class="action-btn">Add Material</button>
+        
+        <div class="data-table-container">
+          <table id="materials-table" class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Color</th>
+                <th>Cost per Gram</th>
+                <th>Quantity Remaining</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Material data will be dynamically added here -->
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Material Form Modal -->
+        <div id="material-modal" class="modal">
+          <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="material-form-title">Add Material</h3>
+            <form id="material-form">
+              <input type="hidden" id="material-id">
+              <div class="form-group">
+                <label for="material-name">Name:</label>
+                <input type="text" id="material-name" required>
+              </div>
+              <div class="form-group">
+                <label for="material-color">Color:</label>
+                <input type="text" id="material-color">
+              </div>
+              <div class="form-group">
+                <label for="material-cost">Cost per Gram:</label>
+                <input type="number" id="material-cost" min="0.01" step="0.01" required>
+              </div>
+              <div class="form-group">
+                <label for="material-quantity">Quantity Remaining (g):</label>
+                <input type="number" id="material-quantity" min="0" step="0.1" required>
+              </div>
+              <button type="submit" class="submit-btn">Save</button>
+            </form>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Reports View -->
+      <section id="reports" class="view">
+        <h2>Reports</h2>
+        
+        <div class="report-filters">
+          <div class="form-group">
+            <label for="report-start-date">Start Date:</label>
+            <input type="date" id="report-start-date">
+          </div>
+          <div class="form-group">
+            <label for="report-end-date">End Date:</label>
+            <input type="date" id="report-end-date">
+          </div>
+          <div class="form-group">
+            <label for="report-user">User:</label>
+            <select id="report-user">
+              <option value="">All Users</option>
+              <!-- User options will be dynamically added here -->
+            </select>
+          </div>
+          <button id="generate-report-btn" class="action-btn">Generate Report</button>
+          <button id="export-csv-btn" class="action-btn">Export CSV</button>
+        </div>
+        
+        <div id="report-results" class="report-results">
+          <!-- Report data will be dynamically added here -->
+        </div>
+      </section>
+    </main>
+  </div>
+  
+  <script src="js/app.js"></script>
+</body>
+</html> 
